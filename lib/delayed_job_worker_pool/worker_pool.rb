@@ -74,9 +74,12 @@ module DelayedJobWorkerPool
     def shutdown(signal)
       log("Shutting down master #{Process.pid} with signal #{signal}")
       self.shutting_down = true
-      worker_pids.each do |child_pid|
-        log("Telling worker #{child_pid} to shutdown with signal #{signal}")
-        Process.kill(signal, child_pid)
+
+      if signal_workers_on_shutdown?
+        worker_pids.each do |child_pid|
+          log("Telling worker #{child_pid} to shutdown with signal #{signal}")
+          Process.kill(signal, child_pid)
+        end
       end
     end
 
@@ -157,8 +160,12 @@ module DelayedJobWorkerPool
       options.fetch(:preload_app, false)
     end
 
+    def signal_workers_on_shutdown?
+      options.fetch(:signal_workers_on_shutdown, true)
+    end
+
     def worker_options(worker_pid)
-      options.except(:workers, :preload_app, *DelayedJobWorkerPool::DSL::CALLBACK_SETTINGS).merge(name: worker_name(worker_pid))
+      options.except(:workers, :preload_app, :signal_workers_on_shutdown, *DelayedJobWorkerPool::DSL::CALLBACK_SETTINGS).merge(name: worker_name(worker_pid))
     end
 
     def create_pipe(inheritable: true)

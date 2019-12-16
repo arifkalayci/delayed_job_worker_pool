@@ -1,6 +1,6 @@
 module DelayedJobWorkerPool
   class DSL
-    SIMPLE_SETTINGS = [:workers, :queues, :min_priority, :max_priority, :sleep_delay, :read_ahead].freeze
+    SIMPLE_SETTINGS = [:workers, :queues, :min_priority, :max_priority, :sleep_delay, :read_ahead, :signal_workers_on_shutdown].freeze
     CALLBACK_SETTINGS = [:after_preload_app, :on_worker_boot, :after_worker_boot, :after_worker_shutdown].freeze
 
     def self.load(path)
